@@ -24,7 +24,7 @@ def read(*names, **kwargs):
 
 
 setup(
-    name='pynetics',
+    name='neticspy',
     version='0.0.0',
     license='MIT',
     description='Python implementation of NetICS.',
