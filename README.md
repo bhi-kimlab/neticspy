@@ -9,7 +9,8 @@ $ pip install neticspy
 ```
 
 ## Description
-
+NetICS performs a per sample bidirectional network diffusion-based method for prioritizing genes based on their proximity to upstream aberration events and to downstream differentially expressed genes and proteins in an interaction network.
+The sample-specific gene lists are integrated into an overall ranked list of genes using rank aggregation technique.
 
 ## Usage
 On the commandline:
