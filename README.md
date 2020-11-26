@@ -1,8 +1,7 @@
 # NetICSpy
-![travis](https://pypi.org/project/neticspy)
+[![version](https://img.shields.io/pypi/v/neticspy.svg)](https://pypi.org/project/neticspy)
 
 Python implementation of [NetICS](https://doi.org/10.1093/bioinformatics/bty148) (Network-based Integration of Multi-omics data).
-
 
 ## Installation
 ```shell
