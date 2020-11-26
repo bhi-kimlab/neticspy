@@ -28,7 +28,7 @@ The default value of beta (restart probability) is 0.4.
 
 Available rank aggregation methods are 'SUM', 'MEDIAN' and 'RRA'.
 
-Input files for differntially expressed genes and proteins are optional.
+Input files for differentially expressed genes and proteins are optional.
 
 ## References
 Dimitrakopoulos, Christos, et al. "Network-based integration of multi-omics data for prioritizing cancer genes." *Bioinformatics* 34.14 (2018): 2441-2448.
