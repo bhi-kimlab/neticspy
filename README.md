@@ -14,16 +14,21 @@ $ pip install neticspy
 ## Usage
 On the commandline:
 ```
-$ neticspy ...
+$ neticspy --abberant MutationFileName --adj AdjecencyMatrix --beta RestartProb --method RankMethod --network NetworkFileName --deg DEGFileName --dep DEPFileName
 ```
 
 As a ordinary python package:
 ```
 import neticspy
 
-neticspy.run(...)
+ranked_list_genes, ranked_scores = neticspy.netics_fun(filenameMu=MutationFileName, filenameAdj=AdjencyMatrix, restart_prob=RestartProb, rank_method_str=RankMethod, filenameNet=NetworkFileName, filenameRNA=DEGFileName, filenamePRDEPFileName)
 ```
 
+The default value of beta (restart probability) is 0.4.
+
+Available rank aggregation methods are 'SUM', 'MEDIAN' and 'RRA'.
+
+Input files for differntially expressed genes and protiens are optional.
 
 ## References
 Dimitrakopoulos, Christos, et al. "Network-based integration of multi-omics data for prioritizing cancer genes." *Bioinformatics* 34.14 (2018): 2441-2448.
