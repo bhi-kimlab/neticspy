@@ -23,6 +23,10 @@ As a ordinary python package:
 import neticspy
 
 ranked_list_genes, ranked_scores = neticspy.netics_fun(filenameMu=MutationFileName, filenameAdj=AdjencyMatrix, restart_prob=RestartProb, rank_method_str=RankMethod, filenameNet=NetworkFileName, filenameRNA=DEGFileName, filenamePRDEPFileName)
+
+or
+
+neticspy.netics_fun(filenameMu=MutationFileName, filenameAdj=AdjencyMatrix, restart_prob=RestartProb, rank_method_str=RankMethod, filenameNet=NetworkFileName, filenameRNA=DEGFileName, filenamePR=DEPFileName, output=OutputFileName)
 ```
 
 The default value of beta (restart probability) is 0.4.
