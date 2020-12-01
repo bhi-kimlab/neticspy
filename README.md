@@ -15,7 +15,7 @@ The sample-specific gene lists are integrated into an overall ranked list of gen
 ## Usage
 On the commandline:
 ```
-$ neticspy --abberant MutationFileName --adj AdjecencyMatrix --beta RestartProb --rank RankMethod --network NetworkFileName --deg DEGFileName --dep DEPFileName
+$ neticspy --abberant MutationFileName --adj AdjecencyMatrix --beta RestartProb --rank RankMethod --network NetworkFileName --deg DEGFileName --dep DEPFileName --output OutputFileName
 ```
 
 As a ordinary python package:
