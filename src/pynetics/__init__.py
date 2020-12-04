@@ -4,8 +4,34 @@ import numpy as np
 import pandas as pd
 from scipy.special import gammainc
 from scipy.stats import beta
+import argparse
+import warnings
 
-def netics_fun(filenameMu=None, filenameAdj=None, restart_prob=0.4, rank_method_str='SUM', filenameNet=None, filenameRNA=None, filenamePR=None):
+warnings.filterwarnings(action='ignore', category=RuntimeWarning)
+
+def parse_args():
+	parser = argparse.ArgumentParser(description='Python implementation of NetICS')
+
+	parser.add_argument('--abberant', type=str, default=None, help='Input file that contains the genetically aberrant genes of each sample.\n It contain two columns that map every gene (1st column) to the samples that it it genetically aberrant (2nd column).')
+	parser.add_argument('--adj', type=str, default=None, help='Adjacency matrix of the directed interaction network.')
+	parser.add_argument('--beta', type=float, default=0.4, help='Restart probability for the insulated diffusion. For (Wu et al., 2010) network use 0.4.')
+	parser.add_argument('--rank', type=str, default='SUM', help="'MEDIAN' uses the median of the sample-specific ranks.\n'RRA' uses the Robust Rank Aggregation method to integrate sample-specific ranked lists.\n'SUM' uses the sum of the sample-specific ranks.")
+	parser.add_argument('--network', type=str, default=None, help='Input file that contains the list of the genes that are present in the network.\nThey should be in the same order as in the rows of the adjacency matrix adj. An example file is given that contains the gene names of the network described in (Wu et al., 2010).')
+	parser.add_argument('--deg', type=str, default=None, help='Tab delimited file with two columns. First column contains the genes for which differential expression\nbetween the tumor and normal samples at the RNA level was measured. Second column contains the p-values\nof these measurements. This file can be the result of a tool for differential expression analysis such as DESeq2.\nEach gene in this file should have only one entry.')
+	parser.add_argument('--dep', type=str, default=None, help='Tab delimited file with two columns. First column contain the proteins for which differential expression between\nthe tumor and normal samples at the protein level was measured. Second column contains the p-values of these\nmeasurements. Each gene in this file should have only one entry.')
+	parser.add_argument('--output', type=str, default='NetICSpy_result.tsv', help='Output file of NetICSpy.')
+
+	return parser.parse_args()
+
+def main():
+	args = parse_args()
+	print(args)
+	netics_fun(args.abberant, args.adj, args.beta, args.rank, args.network, args.deg, args.dep, args.output)
+
+if __name__ == '__main__':
+	main()
+
+def netics_fun(filenameMu=None, filenameAdj=None, restart_prob=0.4, rank_method_str='SUM', filenameNet=None, filenameRNA=None, filenamePR=None, output=None):
 	# Accept arguments and check input
 	if None in [filenameMu, filenameAdj, filenameNet]:
 		raise ValueError('Missing input arguments.')
@@ -57,6 +83,11 @@ def netics_fun(filenameMu=None, filenameAdj=None, restart_prob=0.4, rank_method_
 	F_opp = insulated_diff(norm_adj(adj.conj().transpose()), restart_prob)
 	print('Running NetICS')
 	ranked_list_genes, scores = prioritization(samples, F, F_opp, network_genes, choose_mut_diff, rank_method_str)
+
+	if output is not None:
+		res = pd.DataFrame([ranked_list_genes, scores], index=['Genes', 'Scores']).T
+		res.to_csv(output, sep='\t', header=True, index=False)
+
 	return ranked_list_genes, scores
 
 def read_mutations(filename):
