@@ -149,8 +149,7 @@ def netics_fun(
 	# })
 	# res.to_csv(output, sep='\t', header=True, index=False)
 	final_data.to_csv(output, index=False)
-
-	# return ranked_list_genes, scores
+	return final_data
 
 def read_mutations(filename):
 	g = np.loadtxt(open(filename, 'r'), delimiter='\t', dtype=str)
