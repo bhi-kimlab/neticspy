@@ -140,7 +140,7 @@ def netics_fun(
 
 	print('Running NetICS...')
 	# ranked_list_genes, scores = prioritization(samples, F, F_opp, network_genes, choose_mut_diff, rank_method, unique_samples)
-	final_data = prioritization(samples, F, F_opposite, network_genes, choose_mut_diff, rank_method, unique_samples)
+	final_data = prioritization(samples, F, F_opposite, network_genes, choose_mut_diff, unique_samples)
 
 	print(f'Saving output to {output}...')
 	# res = pd.DataFrame({
@@ -161,7 +161,7 @@ def read_mutations(filename):
 
 	return unique_samples, mutation_data
 
-def prioritization(samples, F, F_opposite, network_genes, choose_up_down_flag, rank_method, unique_samples):
+def prioritization(samples, F, F_opposite, network_genes, choose_up_down_flag, unique_samples):
 	num_samples, num_genes = len(samples['DNA_network']), len(network_genes)
 
 	final_data = []
