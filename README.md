@@ -13,7 +13,7 @@ NetICS performs a per sample bidirectional network diffusion-based method for pr
 The sample-specific gene lists are integrated into an overall ranked list of genes using rank aggregation technique.
 
 ## Usage
-On the commandline:
+**On the commandline**
 ```
 $ neticspy --aberration ABERRATION \
     --adj ADJACENCY_MATRIX \
@@ -42,17 +42,23 @@ $ neticspy --aberration ABERRATION \
 
 `-g OPPOSITE_DIFFUSION_MATRIX, --opposite-diffusion-matrix OPPOSITE_DIFFUSION_MATRIX`: To accelerate the diffusion process, you can feed precomputed diffusion matrix in the *opposite* direction into NetICS.
 
-As a ordinary python package:
+**As an ordinary python package**
 ```
 import neticspy
 
-ranked_list_genes, ranked_scores = neticspy.netics_fun(filenameMu=MutationFileName, filenameAdj=AdjencyMatrix, restart_prob=RestartProb, rank_method_str=RankMethod, filenameNet=NetworkFileName, filenameRNA=DEGFileName, filenamePRDEPFileName)
-
-or
-
-neticspy.netics_fun(filenameMu=MutationFileName, filenameAdj=AdjencyMatrix, restart_prob=RestartProb, rank_method_str=RankMethod, filenameNet=NetworkFileName, filenameRNA=DEGFileName, filenamePR=DEPFileName, output=OutputFileName)
+netics_result = neticspy.netics_fun(
+    filename_aberration,
+    filename_adj,
+    filename_net,
+    output,
+    degs=None,
+    filename_F=None,
+    filename_F_opposite=None,
+    restart_prob=0.4,
+)
 ```
 
+## Note
 The default value of beta (restart probability) is 0.4.
 
 Available rank aggregation methods are 'SUM', 'MEDIAN' and 'RRA'.
