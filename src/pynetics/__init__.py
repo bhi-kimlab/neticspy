@@ -25,7 +25,7 @@ def parse_args():
 		'--aberration',
 		required=True,
 		type=str,
-		help='Input file that contains the genetically aberrant genes of each sample.\n It contain two columns that map every gene (1st column) to the samples that it it genetically aberrant (2nd column).'
+		help='Input two-column table (without headers) containing genetically aberrant genes for each sample. It contain two columns that map every gene (1st column) to the samples that it it genetically aberrant (2nd column).'
 	)
 	parser.add_argument(
 		'-j',
@@ -35,25 +35,13 @@ def parse_args():
 		help='Adjacency matrix of the directed interaction network.'
 	)
 	parser.add_argument(
-		'-b',
-		'--beta',
-		type=float,
-		default=0.4,
-		help='Restart probability for the insulated diffusion. For (Wu et al., 2010) network use 0.4.'
-	)
-	parser.add_argument(
-		'-r',
-		'--rank',
-		default='SUM',
-		help="'MEDIAN' uses the median of the sample-specific ranks.\n'RRA' uses the Robust Rank Aggregation method to integrate sample-specific ranked lists.\n'SUM' uses the sum of the sample-specific ranks."
-	)
-	parser.add_argument(
 		'-n',
 		'--network',
 		required=True,
 		help='Input file that contains the list of the genes that are present in the network.\nThey should be in the same order as in the rows of the adjacency matrix adj. An example file is given that contains the gene names of the network described in (Wu et al., 2010).'
 	)
 	parser.add_argument(
+		'-d',
 		'--degs',
 		default=None,
 		help='List of the names of predefined differentially expressed genes.',
@@ -62,19 +50,32 @@ def parse_args():
 		'-o',
 		'--output',
 		required=True,
-		help='Output file of NetICSpy.'
+		help='File to save NetICS result.'
 	)
+	parser.add_argument(
+		'-b',
+		'--beta',
+		type=float,
+		default=0.4,
+		help='Restart probability for the insulated diffusion. Default: 0.4 (For the network from Wu et al., 2010)'
+	)
+	# parser.add_argument(
+	# 	'-r',
+	# 	'--rank',
+	# 	default='SUM',
+	# 	help="'MEDIAN' uses the median of the sample-specific ranks.\n'RRA' uses the Robust Rank Aggregation method to integrate sample-specific ranked lists.\n'SUM' uses the sum of the sample-specific ranks."
+	# )
 	parser.add_argument(
 		'-f',
 		'--diffusion-matrix',
 		default=None,
-		help='Path to .npy file for diffusion matrix.'
+		help='(Optional) Path to .npy file for diffusion matrix.'
 	)
 	parser.add_argument(
 		'-g',
 		'--opposite-diffusion-matrix',
 		default=None,
-		help='Path to .npy file for diffusion matrix in opposite direction.'
+		help='(Optional) Path to .npy file for diffusion matrix in opposite direction.'
 	)
 
 	return parser.parse_args()
@@ -88,13 +89,13 @@ def netics_fun(
 		filename_F=None,
 		filename_F_opposite=None,
 		restart_prob=0.4,
-		rank_method='SUM',
+		# rank_method='SUM',
 	):
 	# Accept arguments and check input.
-	if rank_method not in ['SUM', 'MEDIAN', 'RRA']:
-		print('Wrong rank method: %s' % rank_method)
-		print('Rank method should be MEDIAN, RRA or SUM')
-		sys.exit(1)
+	# if rank_method not in ['SUM', 'MEDIAN', 'RRA']:
+	# 	print('Wrong rank method: %s' % rank_method)
+	# 	print('Rank method should be MEDIAN, RRA or SUM')
+	# 	sys.exit(1)
 
 	unique_samples, mutation_data = read_mutations(filename_aberration)
 	adj = np.loadtxt(open(filename_adj), delimiter='\t')
@@ -253,7 +254,7 @@ def correctBetaPvalues(p, k):
 
 def main():
 	args = parse_args()
-	netics_fun(args.aberration, args.adj, args.network, args.output, args.degs, args.diffusion_matrix, args.opposite_diffusion_matrix, args.beta, args.rank)
+	netics_fun(args.aberration, args.adj, args.network, args.output, args.degs, args.diffusion_matrix, args.opposite_diffusion_matrix, args.beta)
 
 if __name__ == '__main__':
 	main()
