@@ -6,7 +6,7 @@ from .const import DIRECTION
 def insulated_diff(W, b):
 	start = time.time()
 	temp = np.identity(len(W)) - (1-b) * W
-	F = b * np.linalg.inv(temp)
+	F = b * np.linalg.pinv(temp)
 	print(f'Insulated diffusion was done in {time.time() - start:.2f} seconds.')
 	return F
 

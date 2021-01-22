@@ -5,14 +5,14 @@
 # automatically for any template). To use it:
 #
 #    pip install cookiepatcher
-#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary pyNetICS
+#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary NetICSpy
 #
 # See:
 #    https://pypi.org/project/cookiepatcher
 #
 # Alternatively, you can run:
 #
-#    cookiecutter --overwrite-if-exists --config-file=pyNetICS/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
+#    cookiecutter --overwrite-if-exists --config-file=NetICSpy/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
 
 default_context:
 
@@ -21,35 +21,35 @@ default_context:
     allow_tests_inside_package: 'no'
     appveyor:                  'yes'
     c_extension_function:      'longest'
-    c_extension_module:        '_pynetics'
+    c_extension_module:        '_neticspy'
     c_extension_optional:      'no'
     c_extension_support:       'no'
     c_extension_test_pypi:     'no'
     c_extension_test_pypi_username: 'bhi-kimlab'
     codacy:                    'no'
-    codacy_projectid:          '[Get ID from https://app.codacy.com/app/bhi-kimlab/pyNetICS/settings]'
+    codacy_projectid:          '[Get ID from https://app.codacy.com/app/bhi-kimlab/neticspy/settings]'
     codeclimate:               'no'
     codecov:                   'yes'
     command_line_interface:    'argparse'
-    command_line_interface_bin_name: 'pynetics'
+    command_line_interface_bin_name: 'neticspy'
     coveralls:                 'no'
-    coveralls_token:           '[Required for Appveyor, take it from https://coveralls.io/github/bhi-kimlab/pyNetICS]'
-    distribution_name:         'pynetics'
+    coveralls_token:           '[Required for Appveyor, take it from https://coveralls.io/github/bhi-kimlab/neticspy]'
+    distribution_name:         'neticspy'
     email:                     'contact@ionelmc.ro'
     full_name:                 'BHI'
     landscape:                 'no'
     license:                   'MIT license'
     linter:                    'flake8'
-    package_name:              'pynetics'
+    package_name:              'neticspy'
     pre_commit:                'yes'
-    project_name:              'pyNetICS'
+    project_name:              'NetICSpy'
     project_short_description: 'Python implementation of NetICS.'
     pypi_badge:                'yes'
     pypi_disable_upload:       'no'
     release_date:              'today'
     repo_hosting:              'github.com'
     repo_hosting_domain:       'github.com'
-    repo_name:                 'pyNetICS'
+    repo_name:                 'NetICSpy'
     repo_username:             'bhi-kimlab'
     requiresio:                'yes'
     scrutinizer:               'no'

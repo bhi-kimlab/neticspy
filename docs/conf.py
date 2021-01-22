@@ -16,7 +16,7 @@ extensions = [
 ]
 source_suffix = '.rst'
 master_doc = 'index'
-project = 'pyNetICS'
+project = 'NetICSpy'
 year = '2020'
 author = 'BHI'
 copyright = '{0}, {1}'.format(year, author)
@@ -25,8 +25,8 @@ version = release = '0.0.4'
 pygments_style = 'trac'
 templates_path = ['.']
 extlinks = {
-    'issue': ('https://github.com/bhi-kimlab/pyNetICS/issues/%s', '#'),
-    'pr': ('https://github.com/bhi-kimlab/pyNetICS/pull/%s', 'PR #'),
+    'issue': ('https://github.com/bhi-kimlab/neticspy/issues/%s', '#'),
+    'pr': ('https://github.com/bhi-kimlab/neticspy/pull/%s', 'PR #'),
 }
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'

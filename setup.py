@@ -34,7 +34,7 @@ setup(
     ),
     author='BHI',
     author_email='contact@ionelmc.ro',
-    url='https://github.com/bhi-kimlab/pyNetICS',
+    url='https://github.com/bhi-kimlab/neticspy',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
@@ -67,7 +67,7 @@ setup(
     project_urls={
         'Documentation': 'https://pyNetICS.readthedocs.io/',
         'Changelog': 'https://pyNetICS.readthedocs.io/en/latest/changelog.html',
-        'Issue Tracker': 'https://github.com/bhi-kimlab/pyNetICS/issues',
+        'Issue Tracker': 'https://github.com/bhi-kimlab/neticspy/issues',
     },
     keywords=[
         # eg: 'keyword1', 'keyword2', 'keyword3',
@@ -86,7 +86,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'pynetics = pynetics.cli:main',
+            'neticspy = neticspy.cli:main',
         ]
     },
 )

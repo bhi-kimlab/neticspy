@@ -35,13 +35,13 @@ Overview
     :alt: Coverage Status
     :target: https://codecov.io/github/bhi-kimlab/pyNetICS
 
-.. |version| image:: https://img.shields.io/pypi/v/pynetics.svg
+.. |version| image:: https://img.shields.io/pypi/v/neticspy.svg
     :alt: PyPI Package latest release
-    :target: https://pypi.org/project/pynetics
+    :target: https://pypi.org/project/neticspy
 
-.. |wheel| image:: https://img.shields.io/pypi/wheel/pynetics.svg
+.. |wheel| image:: https://img.shields.io/pypi/wheel/neticspy.svg
     :alt: PyPI Wheel
-    :target: https://pypi.org/project/pynetics
+    :target: https://pypi.org/project/neticspy
 
 .. |supported-versions| image:: https://img.shields.io/pypi/pyversions/pynetics.svg
     :alt: Supported versions
@@ -68,11 +68,11 @@ Installation
 
 ::
 
-    pip install pynetics
+    pip install neticspy
 
 You can also install the in-development version with::
 
-    pip install https://github.com/bhi-kimlab/pyNetICS/archive/master.zip
+    pip install https://github.com/bhi-kimlab/neticspy/archive/master.zip
 
 
 Documentation
