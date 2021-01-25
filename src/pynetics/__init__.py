@@ -123,11 +123,7 @@ def netics_fun(
 
 	for i in range(len(samples['DNA'])):
 		samples['RNA'].append(diff_expr_genes[i])
-		# samples['RNA_network'].append(np.intersect1d(network_genes, samples['RNA'][i]).astype(str))
 		samples['RNA_network'].append(diff_expr_genes[i])
-
-		# print(len(np.intersect1d(network_genes, diff_expr_genes).astype(str)))
-		# print(samples['RNA_network'][-1])
 
 	# Load or compute diffusion matrix.
 	if filename_F is not None and filename_F_opposite is not None:
@@ -139,15 +135,9 @@ def netics_fun(
 		F_opposite = diffusion.insulated_diff(util.row_normalize(adj.conj().transpose()), restart_prob)
 
 	print('Running NetICS...')
-	# ranked_list_genes, scores = prioritization(samples, F, F_opp, network_genes, choose_mut_diff, rank_method, unique_samples)
 	final_data = prioritization(samples, F, F_opposite, network_genes, choose_mut_diff, unique_samples)
 
 	print(f'Saving output to {output}...')
-	# res = pd.DataFrame({
-		# 'Genes': ranked_list_genes,
-		# 'Scores': scores,
-	# })
-	# res.to_csv(output, sep='\t', header=True, index=False)
 	final_data.to_csv(output, index=False)
 	return final_data
 
@@ -173,15 +163,16 @@ def prioritization(samples, F, F_opposite, network_genes, choose_up_down_flag, u
 		aberrant_genes, de_genes = samples['DNA_network'][i], samples['RNA_network'][i]
 
 		if len(aberrant_genes) == 0:
-			flag = 2  # If there is no aberrant genes, just diffuse up from DE genes.
+			flag = DIRECTION.UP  # If there is no aberrant genes, just diffuse up from DE genes.
 		else:
 			flag = choose_up_down_flag
 
+		print(f'Computing diffusion scores for {sample}')
 		diffusion_scores = diffusion.diffuse_all(flag, aberrant_genes, de_genes, network_genes, F, F_opposite)
-		print(sample, len(samples['DNA_network'][i]), len(samples['RNA_network'][i]))
+		print(sample, len(samples['DNA_network'][i]), len(samples['RNA_network'][i]), flag)
 		print(diffusion_scores.flatten().sum())
-		tmp_result['Diffusion_score'] = diffusion_scores.flatten()
 
+		tmp_result['Diffusion_score'] = diffusion_scores.flatten()
 		tmp_result = pd.DataFrame(tmp_result)
 		tmp_result['Rank'] = tmp_result['Diffusion_score'].rank(ascending=False)
 
