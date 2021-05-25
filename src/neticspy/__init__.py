@@ -124,7 +124,6 @@ def netics_fun(
         output,
         filename_deg_list=None,
         filename_diffusion_matrix=None,
-        restart_prob=0.4,
         verbose=False,
         # rank_method='SUM',
     ):
@@ -226,7 +225,6 @@ def main():
             args.output_prefix,
             args.degs,
             args.diffusion_matrix,
-            args.beta,
             verbose=args.verbose,
         )
 

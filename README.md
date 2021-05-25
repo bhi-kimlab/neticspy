@@ -16,7 +16,7 @@ The sample-specific gene lists are integrated into an overall ranked list of gen
 There are two subcommands: `neticspy diffuse` and `neticspy rank`.
 
 ### diffuse
-Prepare diffusion matrix for given network and restart probability.
+Prepare diffusion matrix for given network and restart probability. This subcommand will produce `.npz` file containing precomputed forward/backward diffusion matrices.
 
 ```
 $ neticspy diffuse --adj ADJ \
@@ -24,6 +24,7 @@ $ neticspy diffuse --adj ADJ \
     --output OUTPUT 
 ```
 **Arguments**
+
 `-a ADJ, --adj ADJ`: Adjacency matrix of the directed interaction network.
 
 `-b BETA, --beta BETA`: Restart probability for the insulated diffusion. Default: 0.4 (For the network from Wu et al., 2010)
@@ -31,7 +32,7 @@ $ neticspy diffuse --adj ADJ \
 `-o OUTPUT, --output OUTPUT`: Output filename for diffusion matrix in .npz format.
 
 ### rank
-Run core NetICS algorithm and rank genes by their mediator effect.
+Run core NetICS algorithm and rank genes by their mediator effect. This subcommand will produce two comma-separated tables: raw result containing sample-gene-diffusion score triplets (raw.txt), and aggregated gene rankings (rank_aggregated.txt) that allow cohort-wise gene prioritization.
 
 ```
 $ neticspy rank --aberration ABERRATION \
@@ -40,9 +41,9 @@ $ neticspy rank --aberration ABERRATION \
     --network NETWORK \
     --degs DEGS \
     --output OUTPUT \
-    [--beta RestartProb]
 ```
 **Arguments**
+
 `-a ABERRATION, --aberration ABERRATION`: Input two-column table (without headers) containing genetically aberrant genes for each sample. It contain two columns that map every gene (1st column) to the samples that it it genetically aberrant (2nd column).
 
 `-f DIFFUSION_MATRIX, --diffusion-matrix DIFFUSION_MATRIX`: Path to .npz file for diffusion matrix.
@@ -52,8 +53,6 @@ $ neticspy rank --aberration ABERRATION \
 `-d DEGS, --degs DEGS`: List of the names of predefined differentially expressed genes.
 
 `-o OUTPUT-PREFIX, --output-prefix OUTPUT-PREFIX`: Prefix of the output file to save raw NetICS result and aggregated ranks.
-
-`-b BETA, --beta BETA`: Restart probability for the insulated diffusion. Default: 0.4 (for the network from Wu et al., 2010.)
 
 `-v, --verbose`: Increase verbosity.
 
@@ -72,10 +71,6 @@ netics_result = neticspy.netics_fun(
 
 ## Note
 The default value of beta (restart probability) is 0.4.
-
-Available rank aggregation methods are 'SUM', 'MEDIAN' and 'RRA'.
-
-Input files for differentially expressed genes and proteins are optional.
 
 ## References
 Dimitrakopoulos, Christos, et al. "Network-based integration of multi-omics data for prioritizing cancer genes." *Bioinformatics* 34.14 (2018): 2441-2448.
