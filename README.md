@@ -13,34 +13,49 @@ NetICS performs a per sample bidirectional network diffusion-based method for pr
 The sample-specific gene lists are integrated into an overall ranked list of genes using rank aggregation technique.
 
 ## Usage
-**On the commandline**
+There are two subcommands: `neticspy diffuse` and `neticspy rank`.
+
+### diffuse
+Prepare diffusion matrix for given network and restart probability.
+
 ```
-$ neticspy --aberration ABERRATION \
+$ neticspy diffuse --adj ADJ \
+    --beta BETA \
+    --output OUTPUT 
+```
+**Arguments**
+`-a ADJ, --adj ADJ`: Adjacency matrix of the directed interaction network.
+
+`-b BETA, --beta BETA`: Restart probability for the insulated diffusion. Default: 0.4 (For the network from Wu et al., 2010)
+
+`-o OUTPUT, --output OUTPUT`: Output filename for diffusion matrix in .npz format.
+
+### rank
+Run core NetICS algorithm and rank genes by their mediator effect.
+
+```
+$ neticspy rank --aberration ABERRATION \
     --adj ADJACENCY_MATRIX \
+    --diffusion-matrix DIFFUSION_MATRIX \
     --network NETWORK \
     --degs DEGS \
     --output OUTPUT \
-    [--beta RestartProb] \
-    [--diffusion-matrix DIFFUSION_MATRIX] \
-    [--opposite-diffusion-matrix OPPOSITE_DIFFUSION_MATRIX] \
+    [--beta RestartProb]
 ```
-
-### Arguments
+**Arguments**
 `-a ABERRATION, --aberration ABERRATION`: Input two-column table (without headers) containing genetically aberrant genes for each sample. It contain two columns that map every gene (1st column) to the samples that it it genetically aberrant (2nd column).
 
-`-j ADJACENCY_MATRIX, --adj ADJACENCY_MATRIX`: Adjacency matrix of the directed interaction network.
+`-f DIFFUSION_MATRIX, --diffusion-matrix DIFFUSION_MATRIX`: Path to .npz file for diffusion matrix.
 
 `-n NETWORK, --network NETWORK`: Input file that contains the list of the genes that are present in the network. They should be in the same order as in the rows of the adjacency matrix given by `--adj`. An example file is given that contains the gene names of the network described in (Wu et al., 2010).
 
 `-d DEGS, --degs DEGS`: List of the names of predefined differentially expressed genes.
 
-`-o OUTPUT, --output OUTPUT`: File to save NetICS result.
+`-o OUTPUT-PREFIX, --output-prefix OUTPUT-PREFIX`: Prefix of the output file to save raw NetICS result and aggregated ranks.
 
 `-b BETA, --beta BETA`: Restart probability for the insulated diffusion. Default: 0.4 (for the network from Wu et al., 2010.)
 
-`-f DIFFUSION_MATRIX, --diffusion-matrix DIFFUSION_MATRIX`: To accelerate the diffusion process, you can feed precomputed diffusion matrix into NetICS.
-
-`-g OPPOSITE_DIFFUSION_MATRIX, --opposite-diffusion-matrix OPPOSITE_DIFFUSION_MATRIX`: To accelerate the diffusion process, you can feed precomputed diffusion matrix in the *opposite* direction into NetICS.
+`-v, --verbose`: Increase verbosity.
 
 **As an ordinary python package**
 ```
@@ -48,12 +63,9 @@ import neticspy
 
 netics_result = neticspy.netics_fun(
     filename_aberration,
-    filename_adj,
-    filename_net,
+    filename_network_genes,
     output,
-    degs=None,
-    filename_F=None,
-    filename_F_opposite=None,
+    filename_deg_list,
     restart_prob=0.4,
 )
 ```

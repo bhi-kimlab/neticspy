@@ -10,14 +10,14 @@ def insulated_diff(W, b):
 	print(f'Insulated diffusion was done in {time.time() - start:.2f} seconds.')
 	return F
 
-def diffuse_all(diffusion_direction, aberrant_genes, degs, network_genes, F, F_opp):
+def diffuse_all(diffusion_direction, aberrant_gene_idx, deg_idx, F, F_opp):
 	# Diffuse mutation labels
 	if diffusion_direction == DIRECTION.DOWN or diffusion_direction == DIRECTION.BOTH:
-		aberration_scores = diffuse(aberrant_genes, network_genes, F)
+		aberration_scores = diffuse(aberrant_gene_idx, F)
 
 	# Diffuse DE labels
 	if diffusion_direction == DIRECTION.UP or diffusion_direction == DIRECTION.BOTH:
-		de_scores = diffuse(degs, network_genes, F_opp)
+		de_scores = diffuse(deg_idx, F_opp)
 
 	# Combines scores by multiplication (use both mutations and DE)
 	if diffusion_direction == DIRECTION.BOTH:
@@ -29,7 +29,9 @@ def diffuse_all(diffusion_direction, aberrant_genes, degs, network_genes, F, F_o
 
 	return ret_scores_all
 
-def diffuse(target_genes, network_genes, F):
-	positions = np.isin(network_genes, target_genes).nonzero()[0]
-	scores = (1 / len(positions)) * np.matmul(np.ones((1, len(positions))), F[positions, :])
+def diffuse(seed_idx, F):
+	scores = 1 / len(seed_idx) * np.matmul(
+		np.ones((1, len(seed_idx))),
+		F[seed_idx, :]
+	)
 	return scores

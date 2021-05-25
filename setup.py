@@ -76,8 +76,9 @@ setup(
     install_requires=[
         'scipy',
         'numpy',
-        'pandas'
+        'pandas',
         'tqdm',
+        'cleanlog==0.1.5',
         # eg: 'aspectlib==1.1.1', 'six>=1.7',
     ],
     extras_require={
