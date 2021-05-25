@@ -67,13 +67,13 @@ def parse_args():
         '-n',
         '--network',
         required=True,
-        help='Input file that contains the list of the genes that are present in the network.\nThey should be in the same order as in the rows of the adjacency matrix adj. An example file is given that contains the gene names of the network described in (Wu et al., 2010).'
+        help='Input file (without headers) that contains the list of the genes that are present in the network.\nThey should be in the same order as in the rows of the adjacency matrix.'
     )
     subparser_rank.add_argument(
         '-d',
         '--degs',
         default=None,
-        help='Two-column table with the names of predefined differentially expressed genes.',
+        help='Two-column table (without headers) with the names of predefined differentially expressed genes and the corresponding samples.',
     )
     subparser_rank.add_argument(
         '-o',

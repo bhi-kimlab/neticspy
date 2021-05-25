@@ -48,7 +48,7 @@ $ neticspy rank --aberration ABERRATION \
 
 `-f DIFFUSION_MATRIX, --diffusion-matrix DIFFUSION_MATRIX`: Path to .npz file for diffusion matrix.
 
-`-n NETWORK, --network NETWORK`: Input file that contains the list of the genes that are present in the network. They should be in the same order as in the rows of the adjacency matrix given by `--adj`. An example file is given that contains the gene names of the network described in (Wu et al., 2010).
+`-n NETWORK, --network NETWORK`: Input file that contains the list of the genes that are present in the network.
 
 `-d DEGS, --degs DEGS`: List of the names of predefined differentially expressed genes.
 
