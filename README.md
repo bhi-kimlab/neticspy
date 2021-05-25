@@ -25,7 +25,7 @@ $ neticspy diffuse --adj ADJ \
 ```
 **Arguments**
 
-`-a ADJ, --adj ADJ`: Adjacency matrix of the directed interaction network.
+`-j ADJ, --adj ADJ`: Adjacency matrix of the directed interaction network.
 
 `-b BETA, --beta BETA`: Restart probability for the insulated diffusion. Default: 0.4 (For the network from Wu et al., 2010)
 
