@@ -44,7 +44,7 @@ $ neticspy rank --aberration ABERRATION \
 ```
 **Arguments**
 
-`-a ABERRATION, --aberration ABERRATION`: Input two-column table (without headers) containing genetically aberrant genes for each sample. It contain two columns that map every gene (1st column) to the samples that it it genetically aberrant (2nd column).
+`-a ABERRATION, --aberration ABERRATION`: Input two-column table (without headers) containing genetically aberrant genes for each sample. It contain two columns that map every gene (1st column) to the samples that it is genetically aberrant (2nd column).
 
 `-f DIFFUSION_MATRIX, --diffusion-matrix DIFFUSION_MATRIX`: Path to .npz file for diffusion matrix.
 
