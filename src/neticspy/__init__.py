@@ -20,7 +20,7 @@ from scipy.stats import combine_pvalues
 warnings.filterwarnings(action='ignore', category=RuntimeWarning)
 
 logger = cleanlog.ColoredLogger('NetICS')
-logger.setLevel(cleanlog.DEBUG)
+logger.setLevel(cleanlog.INFO)
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Python implementation of NetICS')
@@ -60,7 +60,7 @@ def parse_args():
     subparser_rank.add_argument(
         '-f',
         '--diffusion-matrix',
-        default=None,
+        required=True,
         help='Path to .npz file for diffusion matrix.'
     )
     subparser_rank.add_argument(
@@ -99,6 +99,7 @@ def parse_args():
         '--verbose',
         default=False,
         action='store_true',
+        help='Print debug messages'
     )
 
     return parser.parse_args()
@@ -122,8 +123,8 @@ def netics_fun(
         filename_aberration,
         filename_genes,
         output,
+        filename_diffusion_matrix,
         filename_deg_list=None,
-        filename_diffusion_matrix=None,
         verbose=False,
         # rank_method='SUM',
     ):
@@ -138,7 +139,7 @@ def netics_fun(
     # unique_samples, mutation_data = read_mutations(filename_aberration)
 
     # Read network genes, line by line.
-    network_genes = [l.strip().upper() for l in open(filename_genes).readlines()][:10000]
+    network_genes = [l.strip().upper() for l in open(filename_genes).readlines()]
     gene2idx = {g:i for i, g in enumerate(network_genes)}
     network_gene_set = set(network_genes)
 
@@ -172,12 +173,12 @@ def netics_fun(
     final_result = pd.concat(final_result)
 
     logger.info(f'Saving output to {output}.raw.txt...')
-    final_result.to_csv(f'{output}.raw.txt', index=False)
+    final_result.to_csv(f'{output}.raw.csv', index=False)
 
     # Rank aggregation.
-    rank_agg_result = final_result.pivot_table(values='rank', index='gene', aggfunc=['mean', 'sum'])
-    rank_agg_result.columns = ['rank_mean', 'rank_sum']
-    rank_agg_result.sort_values('rank_mean').to_csv(f'{output}.rank_aggregated.txt')
+    rank_agg_result = final_result.pivot_table(values='rank', index='gene', aggfunc=['mean', 'median'])
+    rank_agg_result.columns = ['rank_mean', 'rank_median']
+    rank_agg_result.sort_values('rank_mean').to_csv(f'{output}.rank_aggregated.csv')
 
     return final_result
 
@@ -223,8 +224,8 @@ def main():
             args.aberration,
             args.network,
             args.output_prefix,
-            args.degs,
             args.diffusion_matrix,
+            args.degs,
             verbose=args.verbose,
         )
 
