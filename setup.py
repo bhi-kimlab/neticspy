@@ -25,7 +25,7 @@ def read(*names, **kwargs):
 
 setup(
     name='neticspy',
-    version='0.1.2',
+    version='0.1.3',
     license='MIT',
     description='Python implementation of NetICS. (Network-based Integration of Multi-omics data).',
     long_description='%s\n%s' % (
