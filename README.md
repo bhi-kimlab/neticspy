@@ -36,7 +36,6 @@ Run core NetICS algorithm and rank genes by their mediator effect. This subcomma
 
 ```
 $ neticspy rank --aberration ABERRATION \
-    --adj ADJACENCY_MATRIX \
     --diffusion-matrix DIFFUSION_MATRIX \
     --network NETWORK \
     --degs DEGS \
