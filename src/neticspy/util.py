@@ -3,7 +3,9 @@ import numpy as np
 from scipy.special import gammainc
 
 def row_normalize(adj):
-	return adj / adj.sum(axis=1).reshape(-1, 1)
+	normalized_adj = adj / adj.sum(axis=1).reshape(-1, 1)
+	np.nan_to_num(normalized_adj, copy=False, nan=0)
+	return normalized_adj
 
 def fdr(pval, qval=0.05, cV=1):
 	# Accept arguments
@@ -44,7 +46,7 @@ def fdr(pval, qval=0.05, cV=1):
 	except ValueError:
 		# Case when it does not cross
 		thr = 0
-	
+
 	# Returns the result
 	pthr = thr
 
