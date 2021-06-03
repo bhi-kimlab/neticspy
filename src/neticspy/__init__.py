@@ -81,13 +81,13 @@ def parse_args():
         required=True,
         help='Prefix of the output file to save raw NetICS result and aggregated ranks.'
     )
-    subparser_rank.add_argument(
-        '-b',
-        '--beta',
-        type=float,
-        default=0.4,
-        help='Restart probability for the insulated diffusion. Default: 0.4 (For the network from Wu et al., 2010)'
-    )
+#    subparser_rank.add_argument(
+#        '-b',
+#        '--beta',
+#        type=float,
+#        default=0.4,
+#        help='Restart probability for the insulated diffusion. Default: 0.4 (For the network from Wu et al., 2010)'
+#    )
     # parser.add_argument(
     # 	'-r',
     # 	'--rank',
