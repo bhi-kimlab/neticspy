@@ -1,3 +1,4 @@
+import os
 import numpy as np
 
 from scipy.special import gammainc
@@ -6,6 +7,21 @@ def row_normalize(adj):
 	normalized_adj = adj / adj.sum(axis=1).reshape(-1, 1)
 	np.nan_to_num(normalized_adj, copy=False, nan=0)
 	return normalized_adj
+
+def mkdir(output):
+    if '/' in output:
+        output_path = '/'.join(output.split('/')[:-1])
+        return os.system(f'mkdir -p {output_path}')
+
+def time_format(t):
+    h = s // 3600
+    s = s % 3600
+    m = s // 60
+    s = s % 60
+    if h != 0:
+        return f'{h}h {m}m {s:.2f}s'
+    else:
+        return f'{m}m {s:.2f}s'
 
 def fdr(pval, qval=0.05, cV=1):
 	# Accept arguments
