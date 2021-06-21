@@ -245,14 +245,18 @@ def permutation_test(seed, sample, flag, aberrant_gene_idx, deg_idx, F, F_opposi
         aberrant_gene_idx = np.random.choice(np.arange(num_genes), len(aberrant_gene_idx))
         deg_idx = np.random.choice(np.arange(num_genes), len(deg_idx))
         
+        aberrant_gene_seed, deg_seed = np.zeros(num_genes), np.zeros(num_genes)
         # Compose random multi-hot vectors.
-        aberrant_gene_seed = np.eye(num_genes)[aberrant_gene_idx].sum(axis=0)
-        deg_seed = np.eye(num_genes)[deg_idx].sum(axis=0)
+        for idx in aberrant_gene_idx:
+            aberrant_gene_seed[idx] = 1
+        for idx in deg_idx:
+            deg_seed[idx] = 1
 
         aberrant_gene_seeds.append(aberrant_gene_seed)
         deg_seeds.append(deg_seed)
 
     aberrant_gene_seeds, deg_seeds = np.array(aberrant_gene_seeds), np.array(deg_seeds)
+    logger.debug(f'{aberrant_gene_seeds.shape}, {deg_seeds.shape}')
     return diffusion.diffuse_all_permutation(flag, aberrant_gene_seeds, deg_seeds, F, F_opposite)
     #return pval_list
 
