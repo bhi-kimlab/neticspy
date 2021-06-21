@@ -8,9 +8,6 @@ import time
 import os
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
-import multiprocessing as mp
-import parmap
 
 from . import util
 from . import diffusion
@@ -112,13 +109,13 @@ def parse_args():
         type=int,
         help='Perform permutation test to evaluate the significance of rank'
     )
-    subparser_rank.add_argument(
-        '-t',
-        '--threads',
-        default=1,
-        type=int,
-        help='Number of thread'
-    )
+#    subparser_rank.add_argument(
+#        '-t',
+#        '--threads',
+#        default=1,
+#        type=int,
+#        help='Number of thread'
+#    )
     subparser_rank.add_argument(
         '-s',
         '--seed',
@@ -154,7 +151,7 @@ def netics_fun(
         verbose=False,
         # rank_method='SUM',
         permutation=0,
-        threads=1,
+        #threads=1,
         seed=42,
     ):
     if verbose:
@@ -197,7 +194,7 @@ def netics_fun(
         mutation_df_per_sample = mutation_df[mutation_df['sample'] == sample]
         deg_df_per_sample = deg_df[deg_df['sample'] == sample]
 
-        result = prioritization(sample, mutation_df_per_sample, deg_df_per_sample, F, F_opposite, network_genes, choose_mut_diff, permutation, threads, seed)
+        result = prioritization(sample, mutation_df_per_sample, deg_df_per_sample, F, F_opposite, network_genes, choose_mut_diff, permutation, seed)
         final_result.append(result)
 
     #pool = mp.Pool(processes=threads)
@@ -238,13 +235,13 @@ def netics_fun(
 def permutation_test(seed, sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, diffusion_score, num_permutation):
     #logger.info(f'Performing permutation test for {sample}.')
     np.random.seed(seed)
-    
+
     num_genes = len(F)
     aberrant_gene_seeds, deg_seeds = [], []
     for _ in range(num_permutation):
-        aberrant_gene_idx = np.random.choice(np.arange(num_genes), len(aberrant_gene_idx))
-        deg_idx = np.random.choice(np.arange(num_genes), len(deg_idx))
-        
+        aberrant_gene_idx = np.random.choice(np.arange(num_genes), len(aberrant_gene_idx), replace=False)
+        deg_idx = np.random.choice(np.arange(num_genes), len(deg_idx), replace=False)
+
         aberrant_gene_seed, deg_seed = np.zeros(num_genes), np.zeros(num_genes)
         # Compose random multi-hot vectors.
         for idx in aberrant_gene_idx:
@@ -261,7 +258,7 @@ def permutation_test(seed, sample, flag, aberrant_gene_idx, deg_idx, F, F_opposi
     #return pval_list
 
 
-def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, choose_up_down_flag, permutation, threads, seed):
+def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, choose_up_down_flag, permutation, seed):
     num_genes = len(network_genes)
 
     result = {
@@ -286,7 +283,7 @@ def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, ch
 
         permutation_list = permutation_test(seed, sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, diffusion_score, num_permutation=permutation)
         logger.debug(f'Permutation result shape = {permutation_list.shape}')
-             
+
         permutation_df = pd.DataFrame(permutation_list).T
         pval_list = [(permutation_df.iloc[idx] >= score).mean() for idx,score in enumerate(diffusion_score)]
         result['permutation_pval'] = pval_list
@@ -318,7 +315,8 @@ def main():
             filename_deg_list=args.degs,
             verbose=args.verbose,
             permutation=args.permutation,
-            threads=args.threads
+            #threads=args.threads,
+            seed=args.seed
         )
 
 if __name__ == '__main__':
