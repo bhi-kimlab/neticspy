@@ -184,13 +184,13 @@ def netics_fun(
     F, F_opposite = diffusion_matrices['forward'], diffusion_matrices['backward']
 
     logger.info('Running NetICS...')
-    #final_result = []
-    #for sample in mutation_df['sample'].unique():
-    #    mutation_df_per_sample = mutation_df[mutation_df['sample'] == sample]
-    #    deg_df_per_sample = deg_df[deg_df['sample'] == sample]
+    final_result = []
+    for sample in mutation_df['sample'].unique():
+        mutation_df_per_sample = mutation_df[mutation_df['sample'] == sample]
+        deg_df_per_sample = deg_df[deg_df['sample'] == sample]
 
-#        result = prioritization(sample, mutation_df_per_sample, deg_df_per_sample, F, F_opposite, network_genes, choose_mut_diff, permutation)
-#        final_result.append(result)
+        result = prioritization(sample, mutation_df_per_sample, deg_df_per_sample, F, F_opposite, network_genes, choose_mut_diff, permutation, threads)
+        final_result.append(result)
 
     #pool = mp.Pool(processes=threads)
     #manager = mp.Manager()
@@ -201,7 +201,7 @@ def netics_fun(
     #pool.join()
 
     #sample_list = [sample for sample in mutation_df['sample'].unique()]
-    final_result = parmap.starmap(run_per_sample, [(sample, mutation_df, deg_df, F, F_opposite, network_genes, choose_mut_diff, permutation) for sample in mutation_df['sample'].unique()], pm_processes=threads, pm_pbar=True)
+    #final_result = parmap.starmap(run_per_sample, [(sample, mutation_df, deg_df, F, F_opposite, network_genes, choose_mut_diff, permutation) for sample in mutation_df['sample'].unique()], pm_processes=threads)#, pm_pbar=True)
 
     final_result = pd.concat(final_result)
 
@@ -219,34 +219,35 @@ def netics_fun(
 #def read_mutations(filename):
 #    return pd.read_csv(filename, sep='\t', names=['gene', 'sample'])
 
-def run_per_sample(sample, mutation_df, deg_df, F, F_opposite, network_genes, choose_mut_diff, permutation):
-    mutation_df_per_sample = mutation_df[mutation_df['sample'] == sample]
-    deg_df_per_sample = deg_df[deg_df['sample'] == sample]
-    result = prioritization(sample, mutation_df_per_sample, deg_df_per_sample, F, F_opposite, network_genes, choose_mut_diff, permutation)
+#def run_per_sample(sample, mutation_df, deg_df, F, F_opposite, network_genes, choose_mut_diff, permutation):
+#    mutation_df_per_sample = mutation_df[mutation_df['sample'] == sample]
+#    deg_df_per_sample = deg_df[deg_df['sample'] == sample]
+#    result = prioritization(sample, mutation_df_per_sample, deg_df_per_sample, F, F_opposite, network_genes, choose_mut_diff, permutation)
 #    final_result.append(result)
-    return result
+#    return result
 
-def permutation_test(sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, permutation, diffusion_score):
-    logger.info(f'Performing permutation test for {sample}.')
-    np.random.seed(42)
+#def permutation_test(sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, permutation, diffusion_score):
+def permutation_test(seed, sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, diffusion_score):
+    #logger.info(f'Performing permutation test for {sample}.')
+    np.random.seed(seed)
     shuffled_aberrant_gene_idx = aberrant_gene_idx
     shuffled_deg_idx = deg_idx
-    permutation_list = []
+    #permutation_list = []
     #for n in tqdm(range(permutation)):
-    for n in range(permutation):
-        np.random.shuffle(shuffled_aberrant_gene_idx)
-        np.random.shuffle(shuffled_deg_idx)
-        shuffled_F = pd.DataFrame(F)
-        shuffled_F_opposite = pd.DataFrame(F_opposite)
-        shuffled_F.loc[aberrant_gene_idx] = shuffled_F.loc[shuffled_aberrant_gene_idx].values
-        shuffled_F_opposite.loc[deg_idx] = shuffled_F_opposite.loc[shuffled_deg_idx].values
-        permutation_list.append(list(diffusion.diffuse_all(flag, aberrant_gene_idx, deg_idx, shuffled_F.values, shuffled_F_opposite.values)[0]))
-    permutation_df = pd.DataFrame(permutation_list).T
-    pval_list = [(permutation_df.iloc[idx] >= score).sum() / permutation for idx, score in enumerate(diffusion_score)]
-    return pval_list
+    #for n in range(permutation):
+    np.random.shuffle(shuffled_aberrant_gene_idx)
+    np.random.shuffle(shuffled_deg_idx)
+    shuffled_F = pd.DataFrame(F)
+    shuffled_F_opposite = pd.DataFrame(F_opposite)
+    shuffled_F.loc[aberrant_gene_idx] = shuffled_F.loc[shuffled_aberrant_gene_idx].values
+    shuffled_F_opposite.loc[deg_idx] = shuffled_F_opposite.loc[shuffled_deg_idx].values
+    return list(diffusion.diffuse_all(flag, aberrant_gene_idx, deg_idx, shuffled_F.values, shuffled_F_opposite.values)[0])
+    #permutation_df = pd.DataFrame(permutation_list).T
+    #pval_list = [(permutation_df.iloc[idx] >= score).sum() / permutation for idx, score in enumerate(diffusion_score)]
+    #return pval_list
 
 
-def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, choose_up_down_flag, permutation):
+def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, choose_up_down_flag, permutation, threads):
     num_genes = len(network_genes)
 
     result = {
@@ -267,7 +268,13 @@ def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, ch
 
     result['diffusion_score'] = diffusion_score
     if permutation:
-        result['permutation_pval'] = permutation_test(sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, permutation, diffusion_score)
+        logger.info(f'Performing spermutation test for {sample}.')
+        #result['permutation_pval'] = permutation_test(sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, permutation, diffusion_score)
+        permutation_list = parmap.starmap(permutation_test, [(seed, sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, diffusion_score) for seed in range(permutation)], pm_processes=threads, pm_pbar=True)
+        permutation_df = pd.DataFrame(permutation_list).T
+        pval_list = [(permutation_df.iloc[idx] >= score).sum() / permutation for idx,score in enumerate(diffusion_score)]
+        result['permutation_pval'] = pval_list
+
     result = pd.DataFrame(result)
 
     if permutation:
