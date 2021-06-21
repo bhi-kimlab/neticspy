@@ -23,7 +23,7 @@ from scipy.stats import combine_pvalues
 
 warnings.filterwarnings(action='ignore', category=RuntimeWarning)
 
-logger = cleanlog.ColoredLogger('NetICS')
+logger = cleanlog.ColoredLogger('NetICS', time=True)
 logger.setLevel(cleanlog.INFO)
 
 def parse_args():
@@ -119,6 +119,13 @@ def parse_args():
         type=int,
         help='Number of thread'
     )
+    subparser_rank.add_argument(
+        '-s',
+        '--seed',
+        default=42,
+        type=int,
+        help='Random seed.'
+    )
 
     return parser.parse_args()
 
@@ -147,7 +154,8 @@ def netics_fun(
         verbose=False,
         # rank_method='SUM',
         permutation=0,
-        threads=1
+        threads=1,
+        seed=42,
     ):
     if verbose:
         logger.setLevel(cleanlog.DEBUG)
@@ -189,7 +197,7 @@ def netics_fun(
         mutation_df_per_sample = mutation_df[mutation_df['sample'] == sample]
         deg_df_per_sample = deg_df[deg_df['sample'] == sample]
 
-        result = prioritization(sample, mutation_df_per_sample, deg_df_per_sample, F, F_opposite, network_genes, choose_mut_diff, permutation, threads)
+        result = prioritization(sample, mutation_df_per_sample, deg_df_per_sample, F, F_opposite, network_genes, choose_mut_diff, permutation, threads, seed)
         final_result.append(result)
 
     #pool = mp.Pool(processes=threads)
@@ -227,27 +235,29 @@ def netics_fun(
 #    return result
 
 #def permutation_test(sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, permutation, diffusion_score):
-def permutation_test(seed, sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, diffusion_score):
+def permutation_test(seed, sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, diffusion_score, num_permutation):
     #logger.info(f'Performing permutation test for {sample}.')
     np.random.seed(seed)
-    shuffled_aberrant_gene_idx = aberrant_gene_idx
-    shuffled_deg_idx = deg_idx
-    #permutation_list = []
-    #for n in tqdm(range(permutation)):
-    #for n in range(permutation):
-    np.random.shuffle(shuffled_aberrant_gene_idx)
-    np.random.shuffle(shuffled_deg_idx)
-    shuffled_F = pd.DataFrame(F)
-    shuffled_F_opposite = pd.DataFrame(F_opposite)
-    shuffled_F.loc[aberrant_gene_idx] = shuffled_F.loc[shuffled_aberrant_gene_idx].values
-    shuffled_F_opposite.loc[deg_idx] = shuffled_F_opposite.loc[shuffled_deg_idx].values
-    return list(diffusion.diffuse_all(flag, aberrant_gene_idx, deg_idx, shuffled_F.values, shuffled_F_opposite.values)[0])
-    #permutation_df = pd.DataFrame(permutation_list).T
-    #pval_list = [(permutation_df.iloc[idx] >= score).sum() / permutation for idx, score in enumerate(diffusion_score)]
+    
+    num_genes = len(F)
+    aberrant_gene_seeds, deg_seeds = [], []
+    for _ in range(num_permutation):
+        aberrant_gene_idx = np.random.choice(np.arange(num_genes), len(aberrant_gene_idx))
+        deg_idx = np.random.choice(np.arange(num_genes), len(deg_idx))
+        
+        # Compose random multi-hot vectors.
+        aberrant_gene_seed = np.eye(num_genes)[aberrant_gene_idx].sum(axis=0)
+        deg_seed = np.eye(num_genes)[deg_idx].sum(axis=0)
+
+        aberrant_gene_seeds.append(aberrant_gene_seed)
+        deg_seeds.append(deg_seed)
+
+    aberrant_gene_seeds, deg_seeds = np.array(aberrant_gene_seeds), np.array(deg_seeds)
+    return diffusion.diffuse_all_permutation(flag, aberrant_gene_seeds, deg_seeds, F, F_opposite)
     #return pval_list
 
 
-def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, choose_up_down_flag, permutation, threads):
+def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, choose_up_down_flag, permutation, threads, seed):
     num_genes = len(network_genes)
 
     result = {
@@ -263,16 +273,18 @@ def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, ch
         flag = choose_up_down_flag
 
     logger.info(f'Computing diffusion scores for {sample}.')
-    diffusion_score = diffusion.diffuse_all(flag, aberrant_gene_idx, deg_idx, F, F_opposite)[0]
+    diffusion_score = diffusion.diffuse_all(flag, aberrant_gene_idx, deg_idx, F, F_opposite)
     logger.debug(f'{sample}, {len(mutation_df)}, {len(deg_df)}, {flag}')
 
     result['diffusion_score'] = diffusion_score
     if permutation:
-        logger.info(f'Performing spermutation test for {sample}.')
-        #result['permutation_pval'] = permutation_test(sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, permutation, diffusion_score)
-        permutation_list = parmap.starmap(permutation_test, [(seed, sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, diffusion_score) for seed in range(permutation)], pm_processes=threads, pm_pbar=True)
+        logger.info(f'Performing permutation test for {sample}.')
+
+        permutation_list = permutation_test(seed, sample, flag, aberrant_gene_idx, deg_idx, F, F_opposite, diffusion_score, num_permutation=permutation)
+        logger.debug(f'Permutation result shape = {permutation_list.shape}')
+             
         permutation_df = pd.DataFrame(permutation_list).T
-        pval_list = [(permutation_df.iloc[idx] >= score).sum() / permutation for idx,score in enumerate(diffusion_score)]
+        pval_list = [(permutation_df.iloc[idx] >= score).mean() for idx,score in enumerate(diffusion_score)]
         result['permutation_pval'] = pval_list
 
     result = pd.DataFrame(result)
