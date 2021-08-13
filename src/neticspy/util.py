@@ -13,7 +13,7 @@ def mkdir(output):
         output_path = '/'.join(output.split('/')[:-1])
         return os.system(f'mkdir -p {output_path}')
 
-def time_format(t):
+def time_format(s):
     h = s // 3600
     s = s % 3600
     m = s // 60

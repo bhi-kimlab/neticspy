@@ -3,12 +3,13 @@ import os
 import numpy as np
 
 from .const import DIRECTION
+from . import util
 
 def insulated_diff(W, b):
-    start = time.time()
+    #start = time.time()
     temp = np.identity(len(W)) - (1-b) * W
     F = b * np.linalg.pinv(temp)
-    print(f'Insulated diffusion was done in {util.time_format(time.time()-start)}.')
+    #print(f'Insulated diffusion was done in {util.time_format(time.time()-start)}.')
     return F
 
 def diffuse_all(diffusion_direction, aberrant_gene_idx, deg_idx, F, F_opp):

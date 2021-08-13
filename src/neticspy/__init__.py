@@ -176,10 +176,11 @@ def netics_fun(
     mutation_df = mutation_df.dropna()
 
     # DEGs.
-    deg_df = pd.read_csv(filename_deg_list, sep='\t', names=['gene', 'sample'])
-    deg_df = deg_df[deg_df.gene.isin(network_gene_set)]
-    deg_df['idx'] = deg_df.gene.map(gene2idx)
-    deg_df = deg_df.dropna()
+    if filename_deg_list is not None:
+        deg_df = pd.read_csv(filename_deg_list, sep='\t', names=['gene', 'sample'])
+        deg_df = deg_df[deg_df.gene.isin(network_gene_set)]
+        deg_df['idx'] = deg_df.gene.map(gene2idx)
+        deg_df = deg_df.dropna()
 
     # Determine the direction of the diffusion.
     choose_mut_diff = DIRECTION.DOWN if filename_deg_list is None else DIRECTION.BOTH
@@ -192,7 +193,10 @@ def netics_fun(
     final_result = []
     for sample in mutation_df['sample'].unique():
         mutation_df_per_sample = mutation_df[mutation_df['sample'] == sample]
-        deg_df_per_sample = deg_df[deg_df['sample'] == sample]
+        if choose_mut_diff == DIRECTION.BOTH:
+            deg_df_per_sample = deg_df[deg_df['sample'] == sample]
+        else:
+            deg_df_per_sample = None
 
         result = prioritization(sample, mutation_df_per_sample, deg_df_per_sample, F, F_opposite, network_genes, choose_mut_diff, permutation, seed)
         final_result.append(result)
@@ -240,20 +244,23 @@ def permutation_test(seed, sample, flag, aberrant_gene_idx, deg_idx, F, F_opposi
     aberrant_gene_seeds, deg_seeds = [], []
     for _ in range(num_permutation):
         aberrant_gene_idx = np.random.choice(np.arange(num_genes), len(aberrant_gene_idx), replace=False)
-        deg_idx = np.random.choice(np.arange(num_genes), len(deg_idx), replace=False)
+        if deg_idx is not None:
+            deg_idx = np.random.choice(np.arange(num_genes), len(deg_idx), replace=False)
 
         aberrant_gene_seed, deg_seed = np.zeros(num_genes), np.zeros(num_genes)
         # Compose random multi-hot vectors.
         for idx in aberrant_gene_idx:
             aberrant_gene_seed[idx] = 1
-        for idx in deg_idx:
-            deg_seed[idx] = 1
+        if deg_idx is not None:
+            for idx in deg_idx:
+                deg_seed[idx] = 1
 
         aberrant_gene_seeds.append(aberrant_gene_seed)
-        deg_seeds.append(deg_seed)
+        if deg_idx is not None:
+            deg_seeds.append(deg_seed)
 
     aberrant_gene_seeds, deg_seeds = np.array(aberrant_gene_seeds), np.array(deg_seeds)
-    logger.debug(f'{aberrant_gene_seeds.shape}, {deg_seeds.shape}')
+    #logger.debug(f'{aberrant_gene_seeds.shape}, {deg_seeds.shape}')
     return diffusion.diffuse_all_permutation(flag, aberrant_gene_seeds, deg_seeds, F, F_opposite)
     #return pval_list
 
@@ -265,8 +272,13 @@ def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, ch
         'sample': [sample] * num_genes,
         'gene': network_genes,
     }
-    aberrant_gene_idx, deg_idx = mutation_df.idx.astype(int).values, deg_df.idx.astype(int).values
-    logger.debug(f'{len(aberrant_gene_idx)}, {len(deg_idx)}')
+
+    if choose_up_down_flag == DIRECTION.BOTH:
+        aberrant_gene_idx, deg_idx = mutation_df.idx.astype(int).values, deg_df.idx.astype(int).values
+    else:
+        aberrant_gene_idx, deg_idx = mutation_df.idx.astype(int).values, None
+
+    #logger.debug(f'{len(aberrant_gene_idx)}, {len(deg_idx)}')
 
     if len(aberrant_gene_idx) == 0:
         flag = DIRECTION.UP
@@ -275,7 +287,7 @@ def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, ch
 
     logger.info(f'Computing diffusion scores for {sample}.')
     diffusion_score = diffusion.diffuse_all(flag, aberrant_gene_idx, deg_idx, F, F_opposite)
-    logger.debug(f'{sample}, {len(mutation_df)}, {len(deg_df)}, {flag}')
+    #logger.debug(f'{sample}, {len(mutation_df)}, {len(deg_df)}, {flag}')
 
     result['diffusion_score'] = diffusion_score
     if permutation:
@@ -291,9 +303,9 @@ def prioritization(sample, mutation_df, deg_df, F, F_opposite, network_genes, ch
     result = pd.DataFrame(result)
 
     if permutation:
-        result['rank'] = result['permutation_pval'].rank(ascending=True)
+        result['rank'] = result['permutation_pval'].rank(ascending=True, method='min')
     else:
-        result['rank'] = result['diffusion_score'].rank(ascending=False)
+        result['rank'] = result['diffusion_score'].rank(ascending=False, method='min')
 
     return result.sort_values('rank')
 
