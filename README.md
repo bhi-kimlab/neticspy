@@ -25,7 +25,7 @@ $ neticspy diffuse --adj ADJ \
 ```
 **Arguments**
 
-`-j ADJ, --adj ADJ`: Adjacency matrix of the directed interaction network.
+`-j ADJ, --adj ADJ`: Adjacency matrix of the directed interaction network. (separted by tab)
 
 `-b BETA, --beta BETA`: Restart probability for the insulated diffusion. Default: 0.4 (For the network from Wu et al., 2010)
 
@@ -47,9 +47,9 @@ $ neticspy rank --aberration ABERRATION \
 
 `-f DIFFUSION_MATRIX, --diffusion-matrix DIFFUSION_MATRIX`: Path to .npz file for diffusion matrix.
 
-`-n NETWORK, --network NETWORK`: Input file that contains the list of the genes that are present in the network.
+`-n NETWORK, --network NETWORK`: Input file that contains the list of the genes that are present in the network. (same order with adjency matrix)
 
-`-d DEGS, --degs DEGS`: List of the names of predefined differentially expressed genes.
+`-d DEGS, --degs DEGS`: List of the names of predefined differentially expressed genes. (same format with aberration file)
 
 `-o OUTPUT-PREFIX, --output-prefix OUTPUT-PREFIX`: Prefix of the output file to save raw NetICS result and aggregated ranks.
 
