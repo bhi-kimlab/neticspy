@@ -51,9 +51,9 @@ Overview
     :alt: Supported implementations
     :target: https://pypi.org/project/pynetics
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/bhi-kimlab/pyNetICS/v0.1.4.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/bhi-kimlab/pyNetICS/v0.1.5.svg
     :alt: Commits since latest release
-    :target: https://github.com/bhi-kimlab/pyNetICS/compare/v0.1.4...master
+    :target: https://github.com/bhi-kimlab/pyNetICS/compare/v0.1.5...master
 
 
 
